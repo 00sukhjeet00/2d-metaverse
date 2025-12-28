@@ -12,6 +12,7 @@ import Button from "../../components/atoms/Button";
 import FormField from "../../components/molecules/FormField";
 import RoomCard from "../../components/molecules/RoomCard";
 import Header from "../../components/organisms/Header";
+import Footer from "../../components/organisms/Footer";
 
 interface Room {
   id: string;
@@ -367,6 +368,8 @@ const RoomsPage = () => {
           </div>
         </div>
       )}
+
+      <Footer />
     </div>
   );
 };
