@@ -40,9 +40,9 @@ Welcome to the **2D Metaverse**, a high-performance, real-time multiplayer virtu
 2.  **Server Setup**:
 
     ```bash
-    npm install
+    yarn
     # Create a .env file with DATABASE_URL and JWT_SECRET
-    npm start
+    yarn dev
     ```
 
 3.  **Client Setup**:
