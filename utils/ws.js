@@ -5,6 +5,15 @@ const activePlayers = new Map();
 
 exports.activePlayers = activePlayers;
 
+// Helper function to broadcast player count updates
+const broadcastPlayerCounts = (io) => {
+  const counts = {};
+  for (const player of activePlayers.values()) {
+    counts[player.room] = (counts[player.room] || 0) + 1;
+  }
+  io.emit("playerCountUpdate", counts);
+};
+
 exports.ws = (io) => {
   io.on("connection", (socket) => {
     console.log("New player connected: ", socket.id);
@@ -80,6 +89,9 @@ exports.ws = (io) => {
         `Sending ${playersInRoom.length} existing players to new joiner`
       );
       socket.emit("currentPlayer", playersInRoom);
+
+      // Broadcast updated player counts to all connected clients
+      broadcastPlayerCounts(io);
     });
 
     socket.on("move", async (data) => {
@@ -118,6 +130,9 @@ exports.ws = (io) => {
         );
         socket.to(player.room).emit("playerLeft", socket.id);
         activePlayers.delete(socket.id);
+
+        // Broadcast updated player counts to all connected clients
+        broadcastPlayerCounts(io);
       }
     });
   });

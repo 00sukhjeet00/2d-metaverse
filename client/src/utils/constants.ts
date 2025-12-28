@@ -15,6 +15,7 @@ export const SOCKET_EVENTS = {
   PLAYER_MOVED: "playerMoved",
   JOIN_SUCCESS: "joinSuccess",
   JOIN_ERROR: "joinError",
+  PLAYER_COUNT_UPDATE: "playerCountUpdate",
 };
 
 export const DEFAULT_MAX_PLAYERS = 50;
