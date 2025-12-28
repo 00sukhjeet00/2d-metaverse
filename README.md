@@ -201,7 +201,7 @@ Built with ❤️, ☕, and a concerning amount of Stack Overflow tabs.
 
 ## 🔗 Links
 
-- **Live Demo**: [Try it here](your-url) *(at your own risk)*
+- **Live Demo**: [Try it here](https://spriteworld.netlify.app/) *(at your own risk)*
 - **Report Bugs**: GitHub Issues *(or just assume they exist)*
 - **Support**: Close your eyes and pray
 
