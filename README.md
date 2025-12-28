@@ -2,7 +2,7 @@
 
 Welcome to the **2D Metaverse**, a high-performance, real-time multiplayer virtual world built with a focus on seamless interaction, modern aesthetics, and robust performance.
 
-![Hero Banner](screenshots/game.png)
+![Hero Banner]
 
 ## ✨ Key Features
 
