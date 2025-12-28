@@ -29,7 +29,7 @@ const Chat = ({ messages, onSendMessage, onClose }: ChatProps) => {
   };
 
   return (
-    <div className="w-80 bg-gray-800 border-l border-gray-700 flex flex-col h-full">
+    <div className="w-full md:w-80 bg-gray-800 border-t md:border-t-0 md:border-l border-gray-700 flex flex-col h-full shadow-xl">
       <div className="px-4 py-3 border-b border-gray-700 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <MessageCircle size={20} className="text-blue-400" />

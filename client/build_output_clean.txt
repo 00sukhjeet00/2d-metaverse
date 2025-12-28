@@ -1,0 +1,6 @@
+﻿
+> client@0.0.0 build
+> tsc -b && vite build
+
+src/components/GameCanvas.tsx(27,5): error TS6133: 'avatar' is declared but its value is never read.
+src/pages/GamePage.tsx(51,33): error TS6133: 'callback' is declared but its value is never read.
