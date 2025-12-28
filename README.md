@@ -14,16 +14,6 @@ Welcome to the **2D Metaverse**, a high-performance, real-time multiplayer virtu
 - **Premium Dark Aesthetics**: A stunning, modern UI featuring a **Glassmorphism-inspired** dark theme with vibrant purple accents.
 - **Live Tech Chat**: Real-time communication within rooms, synced perfectly with player entities.
 
-## 🖼️ UI Gallery
-
-```carousel
-![Login Page](screenshots/login.png)
-<!-- slide -->
-![Rooms Selection](screenshots/rooms.png)
-<!-- slide -->
-![Game World](screenshots/game.png)
-```
-
 ## 🛠️ Technology Stack
 
 - **Frontend**: React, TypeScript, Vite, TailwindCSS (Vanilla CSS for custom components), Framer Motion.
