@@ -22,7 +22,17 @@ const io = socketIo(server, {
 connectDB();
 ws(io);
 
-app.use(cors());
+// Health check
+app.get("/", (req, res) => {
+  res.json({ status: "active", message: "2D Metaverse API is running" });
+});
+
+app.use(
+  cors({
+    origin: process.env.CLIENT_URL || "*",
+    credentials: true,
+  })
+);
 app.use(express.json());
 app.use("/api", userRoutes);
 app.use("/api/rooms", roomRoutes);
