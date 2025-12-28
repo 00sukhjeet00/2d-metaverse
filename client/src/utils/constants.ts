@@ -13,6 +13,7 @@ export const SOCKET_EVENTS = {
   CHAT_MESSAGE: "chatMessage",
   CURRENT_PLAYER: "currentPlayer",
   PLAYER_MOVED: "playerMoved",
+  JOIN_SUCCESS: "joinSuccess",
 };
 
 export const DEFAULT_MAX_PLAYERS = 50;

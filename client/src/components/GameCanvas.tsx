@@ -17,7 +17,15 @@ interface GameCanvasProps {
 const GameCanvas = ({ user, players, socket }: GameCanvasProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const keysPressed = useRef<{ [key: string]: boolean }>({});
-  const playerPos = useRef(user.position);
+  const playerPos = useRef(user.position || { x: 400, y: 300 });
+
+  // Sync position if user data is updated (e.g. from joinSuccess)
+  useEffect(() => {
+    if (user?.position) {
+      playerPos.current = user.position;
+    }
+  }, [user]);
+
   const animationFrame = useRef<any>(null);
 
   const drawPlayer = (

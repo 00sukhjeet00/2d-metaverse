@@ -21,6 +21,7 @@ const GamePage = () => {
   const [messages, setMessages] = useState<any[]>([]);
   const [showChat, setShowChat] = useState(true);
   const [isConnected, setIsConnected] = useState(false);
+  const [syncedUser, setSyncedUser] = useState<any>(null);
 
   // Initialize Socket.io
   useEffect(() => {
@@ -42,6 +43,11 @@ const GamePage = () => {
       setIsConnected(true);
       // Join the room after connection
       socket.emit(SOCKET_EVENTS.JOIN, { userId: user.id, room: roomId });
+    });
+
+    socket.on(SOCKET_EVENTS.JOIN_SUCCESS, (data: any) => {
+      console.log("Join success, synced position:", data.position);
+      setSyncedUser(data);
     });
 
     socket.on("connect_error", (error) => {
@@ -150,7 +156,7 @@ const GamePage = () => {
           </Button>
 
           <GameCanvas
-            user={user}
+            user={syncedUser || user}
             players={players}
             socket={socketRef.current}
           />

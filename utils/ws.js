@@ -21,15 +21,25 @@ exports.ws = (io) => {
       socket.userId = userId;
       socket.currentRoom = room;
 
+      // --- Cleanup: Remove any existing "ghost" sessions for this userId ---
+      for (const [id, player] of activePlayers.entries()) {
+        if (player.userId === userId) {
+          console.log(`Cleaning up stale session for user ${userId}: ${id}`);
+          // Notify others the old socket is gone (if they were in a room)
+          socket.to(player.room).emit("playerLeft", id);
+          activePlayers.delete(id);
+        }
+      }
+
       const playerData = {
         id: socket.id, // Use socket.id instead of userId to allow multi-tabs
         userId,
         room,
         username: user.username,
         avatar: user.avatar,
-        position: {
-          x: (user.position?.x || 400) + (Math.random() - 0.5) * 60,
-          y: (user.position?.y || 300) + (Math.random() - 0.5) * 60,
+        position: user.position || {
+          x: 400 + (Math.random() - 0.5) * 60,
+          y: 300 + (Math.random() - 0.5) * 60,
         },
       };
 
@@ -38,6 +48,9 @@ exports.ws = (io) => {
 
       // Broadcast to others in the room
       socket.to(room).emit("playerJoined", playerData);
+
+      // Send success back to the creator with their assigned data (including position)
+      socket.emit("joinSuccess", playerData);
 
       // Send current players to the new joiner (excluding themselves)
       const playersInRoom = Array.from(activePlayers.values()).filter(
