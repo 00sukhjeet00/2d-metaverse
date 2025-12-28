@@ -4,6 +4,8 @@ Welcome to the **2D Metaverse** - where the term "metaverse" is used *very* gene
 
 A real-time multiplayer virtual world that currently features circles moving around and chatting. But hey, the WebSocket magic works! 🎩✨
 
+Try it!: https://spriteworld.netlify.app/
+
 ![Hero Banner](screenshots/game.png)
 *Screenshot may look better than actual product. Results may vary.*
 
