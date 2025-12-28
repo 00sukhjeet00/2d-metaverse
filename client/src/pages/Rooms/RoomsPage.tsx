@@ -183,9 +183,9 @@ const RoomsPage = () => {
           {/* Create New Room Card */}
           <button
             onClick={() => setShowModal(true)}
-            className="h-full min-h-[180px] border-2 border-dashed border-gray-700/50 rounded-2xl flex flex-col items-center justify-center text-gray-500 hover:border-blue-500/50 hover:text-blue-400 hover:bg-blue-500/5 transition-all duration-300 group shadow-lg"
+            className="h-full min-h-[180px] border-2 border-dashed border-gray-700/50 rounded-2xl flex flex-col items-center justify-center text-gray-500 hover:border-purple-500/50 hover:text-purple-400 hover:bg-purple-500/5 transition-all duration-300 group shadow-lg"
           >
-            <div className="p-4 rounded-full bg-gray-800 group-hover:bg-blue-500/20 mb-3 transition-colors duration-300">
+            <div className="p-4 rounded-full bg-gray-800 group-hover:bg-purple-500/20 mb-3 transition-colors duration-300">
               <Plus size={32} />
             </div>
             <span className="font-bold tracking-wide">Create New World</span>

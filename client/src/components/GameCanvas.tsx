@@ -42,7 +42,7 @@ const GameCanvas = ({ user, players, socket }: GameCanvasProps) => {
     ctx.fill();
 
     // Draw body
-    ctx.fillStyle = isCurrentPlayer ? "#4a90e2" : "#e74c3c";
+    ctx.fillStyle = isCurrentPlayer ? "#9333ea" : "#4ade80"; // Current: Purple, Others: Green
     ctx.beginPath();
     ctx.arc(x, y, 20, 0, Math.PI * 2);
     ctx.fill();

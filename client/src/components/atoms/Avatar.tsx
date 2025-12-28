@@ -1,14 +1,14 @@
 interface AvatarProps {
   initial: string;
   size?: "sm" | "md" | "lg";
-  variant?: "blue" | "gray";
+  variant?: "purple" | "gray";
   title?: string;
 }
 
 const Avatar = ({
   initial,
   size = "md",
-  variant = "blue",
+  variant = "purple",
   title,
 }: AvatarProps) => {
   const sizes = {
@@ -18,7 +18,7 @@ const Avatar = ({
   };
 
   const variants = {
-    blue: "bg-blue-500 text-white",
+    purple: "bg-purple-500 text-white",
     gray: "bg-gray-700 text-gray-400",
   };
 

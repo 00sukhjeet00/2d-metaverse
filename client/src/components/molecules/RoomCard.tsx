@@ -31,10 +31,10 @@ const RoomCard = ({
   return (
     <div
       onClick={onJoin}
-      className="bg-gray-800 rounded-xl p-6 cursor-pointer hover:ring-2 hover:ring-blue-500 transition border border-gray-700 hover:border-transparent group relative flex flex-col"
+      className="bg-gray-800 rounded-xl p-6 cursor-pointer hover:ring-2 hover:ring-purple-500 transition border border-gray-700 hover:border-transparent group relative flex flex-col"
     >
       <div className="flex justify-between items-start mb-4">
-        <h3 className="text-xl font-bold text-white group-hover:text-blue-400 transition pr-16 line-clamp-1">
+        <h3 className="text-xl font-bold text-white group-hover:text-purple-400 transition pr-16 line-clamp-1">
           {name}
         </h3>
         <div className="flex items-center gap-2">
@@ -42,7 +42,7 @@ const RoomCard = ({
             <div className="flex gap-1.5">
               <button
                 onClick={onEdit}
-                className="p-1.5 bg-gray-900 text-gray-400 hover:text-blue-400 hover:bg-gray-700 rounded-lg transition"
+                className="p-1.5 bg-gray-900 text-gray-400 hover:text-purple-400 hover:bg-gray-700 rounded-lg transition"
                 title="Edit Room"
               >
                 <Edit2 size={14} />
