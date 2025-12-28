@@ -234,6 +234,7 @@ const RoomsPage = () => {
               maxPlayers={room.maxPlayers}
               players={room.players}
               isCreator={room.createdBy === user?.id}
+              isPrivate={room.isPrivate}
               onJoin={() => handleJoinRoom(room)}
               onEdit={(e) => openEditModal(e, room)}
               onDelete={(e) => handleDeleteRoom(e, room.id)}
