@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Plus, Users, LogOut } from "lucide-react";
+import { Plus, Users, LogOut, Edit2, Trash2, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import {
   DEFAULT_MAX_PLAYERS,
@@ -15,6 +15,8 @@ interface Room {
   name: string;
   maxPlayers: number;
   currentPlayers: number;
+  createdBy: string;
+  players: { username: string; avatar: string }[];
 }
 
 interface RoomSelectionProps {
@@ -28,6 +30,7 @@ const RoomSelection = ({ username: propUsername }: RoomSelectionProps) => {
 
   const [rooms, setRooms] = useState<Room[]>([]);
   const [showModal, setShowModal] = useState(false);
+  const [editingRoom, setEditingRoom] = useState<Room | null>(null);
   const [newRoomName, setNewRoomName] = useState("");
   const [maxPlayers, setMaxPlayers] = useState(DEFAULT_MAX_PLAYERS);
   const [loading, setLoading] = useState(false);
@@ -37,6 +40,13 @@ const RoomSelection = ({ username: propUsername }: RoomSelectionProps) => {
     id: serverRoom._id,
     name: serverRoom.name,
     maxPlayers: serverRoom.maxPlayers,
+    createdBy: serverRoom.createdBy,
+    players: serverRoom.activePlayers
+      ? serverRoom.activePlayers.map((p: any) => ({
+          username: p.username,
+          avatar: p.avatar,
+        }))
+      : [],
     currentPlayers: serverRoom.activePlayers
       ? serverRoom.activePlayers.length
       : 0,
@@ -92,6 +102,61 @@ const RoomSelection = ({ username: propUsername }: RoomSelectionProps) => {
     }
   };
 
+  const handleDeleteRoom = async (e: React.MouseEvent, roomId: string) => {
+    e.stopPropagation();
+    if (!window.confirm("Are you sure you want to delete this room?")) return;
+
+    try {
+      await api.delete(`${API_ENDPOINTS.ROOMS}/${roomId}`);
+      setRooms(rooms.filter((r) => r.id !== roomId));
+    } catch (err: any) {
+      console.error("Failed to delete room", err);
+      alert(err.response?.data?.error || "Failed to delete room");
+    }
+  };
+
+  const openEditModal = (e: React.MouseEvent, room: Room) => {
+    e.stopPropagation();
+    setEditingRoom(room);
+    setNewRoomName(room.name);
+    setMaxPlayers(room.maxPlayers);
+    setShowModal(true);
+  };
+
+  const handleUpdateRoom = async () => {
+    if (!editingRoom || !newRoomName.trim()) return;
+
+    setLoading(true);
+    setError("");
+
+    try {
+      const response = await api.put(
+        `${API_ENDPOINTS.ROOMS}/${editingRoom.id}`,
+        {
+          name: newRoomName,
+          maxPlayers: maxPlayers,
+        }
+      );
+
+      const updatedRoom = transformRoom(response.data);
+      setRooms(rooms.map((r) => (r.id === editingRoom.id ? updatedRoom : r)));
+      closeModal();
+    } catch (err: any) {
+      console.error("Failed to update room", err);
+      setError(err.response?.data?.error || "Failed to update room");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+    setEditingRoom(null);
+    setNewRoomName("");
+    setMaxPlayers(DEFAULT_MAX_PLAYERS);
+    setError("");
+  };
+
   return (
     <div className="min-h-screen bg-gray-900 p-8">
       {/* Header */}
@@ -133,31 +198,60 @@ const RoomSelection = ({ username: propUsername }: RoomSelectionProps) => {
           <div
             key={room.id}
             onClick={() => handleJoinRoom(room)}
-            className="bg-gray-800 rounded-xl p-6 cursor-pointer hover:ring-2 hover:ring-blue-500 transition border border-gray-700 hover:border-transparent group"
+            className="bg-gray-800 rounded-xl p-6 cursor-pointer hover:ring-2 hover:ring-blue-500 transition border border-gray-700 hover:border-transparent group relative"
           >
             <div className="flex justify-between items-start mb-4">
-              <h3 className="text-xl font-bold text-white group-hover:text-blue-400 transition">
+              <h3 className="text-xl font-bold text-white group-hover:text-blue-400 transition pr-16">
                 {room.name}
               </h3>
-              <div className="flex items-center gap-1 text-gray-400 bg-gray-900 px-2 py-1 rounded text-sm">
-                <Users size={14} />
-                <span>
-                  {room.currentPlayers}/{room.maxPlayers}
-                </span>
+              <div className="flex items-center gap-2">
+                {room.createdBy === user?.id && (
+                  <div className="flex gap-2">
+                    <button
+                      onClick={(e) => openEditModal(e, room)}
+                      className="p-2 bg-gray-900 text-gray-400 hover:text-blue-400 hover:bg-gray-700 rounded-lg transition"
+                      title="Edit Room"
+                    >
+                      <Edit2 size={16} />
+                    </button>
+                    <button
+                      onClick={(e) => handleDeleteRoom(e, room.id)}
+                      className="p-2 bg-gray-900 text-gray-400 hover:text-red-400 hover:bg-gray-700 rounded-lg transition"
+                      title="Delete Room"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                )}
+                <div className="flex items-center gap-1 text-gray-400 bg-gray-900 px-2 py-1 rounded text-sm">
+                  <Users size={14} />
+                  <span>
+                    {room.currentPlayers}/{room.maxPlayers}
+                  </span>
+                </div>
               </div>
             </div>
 
             <div className="flex items-center gap-2">
               <div className="flex -space-x-2 overflow-hidden">
-                {/* Mock avatars for visual consistency */}
-                {[...Array(Math.min(3, room.currentPlayers))].map((_, i) => (
-                  <div
-                    key={i}
-                    className="inline-block h-8 w-8 rounded-full ring-2 ring-gray-800 bg-gray-600"
-                  />
-                ))}
+                {room.players
+                  .slice(0, 3)
+                  .map(
+                    (
+                      player: { username: string; avatar: string },
+                      i: number
+                    ) => (
+                      <div
+                        key={i}
+                        className="h-8 w-8 rounded-full ring-2 ring-gray-800 bg-blue-500 flex items-center justify-center text-[10px] text-white font-bold"
+                        title={`${player.username} (${player.avatar})`}
+                      >
+                        <span>{player.username.charAt(0).toUpperCase()}</span>
+                      </div>
+                    )
+                  )}
                 {room.currentPlayers > 3 && (
-                  <div className="inline-block h-8 w-8 rounded-full ring-2 ring-gray-800 bg-gray-700 flex items-center justify-center text-xs text-gray-400 font-medium">
+                  <div className="h-8 w-8 rounded-full ring-2 ring-gray-800 bg-gray-700 flex items-center justify-center text-xs text-gray-400 font-medium">
                     +{room.currentPlayers - 3}
                   </div>
                 )}
@@ -170,12 +264,18 @@ const RoomSelection = ({ username: propUsername }: RoomSelectionProps) => {
         ))}
       </div>
 
-      {/* Create Room Modal */}
+      {/* Room Modal (Create/Edit) */}
       {showModal && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
-          <div className="bg-gray-800 rounded-2xl w-full max-w-md p-6 shadow-xl border border-gray-700">
+          <div className="bg-gray-800 rounded-2xl w-full max-w-md p-6 shadow-xl border border-gray-700 relative">
+            <button
+              onClick={closeModal}
+              className="absolute top-4 right-4 text-gray-400 hover:text-white transition"
+            >
+              <X size={24} />
+            </button>
             <h2 className="text-2xl font-bold text-white mb-6">
-              Create New Room
+              {editingRoom ? "Edit Room" : "Create New Room"}
             </h2>
 
             <div className="space-y-4">
@@ -208,17 +308,23 @@ const RoomSelection = ({ username: propUsername }: RoomSelectionProps) => {
 
               <div className="flex gap-3 mt-8">
                 <button
-                  onClick={() => setShowModal(false)}
+                  onClick={closeModal}
                   className="flex-1 py-3 rounded-lg font-semibold text-gray-400 hover:text-white hover:bg-gray-700 transition"
                 >
                   Cancel
                 </button>
                 <button
-                  onClick={handleCreateRoom}
+                  onClick={editingRoom ? handleUpdateRoom : handleCreateRoom}
                   disabled={loading}
                   className="flex-1 py-3 rounded-lg font-semibold bg-blue-600 text-white hover:bg-blue-700 transition shadow-lg shadow-blue-600/20 disabled:opacity-50"
                 >
-                  {loading ? "Creating..." : "Create Room"}
+                  {loading
+                    ? editingRoom
+                      ? "Updating..."
+                      : "Creating..."
+                    : editingRoom
+                    ? "Update Room"
+                    : "Create Room"}
                 </button>
               </div>
             </div>

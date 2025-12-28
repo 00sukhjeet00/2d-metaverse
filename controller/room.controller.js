@@ -1,9 +1,23 @@
 const Room = require("../model/room.model");
 const asyncHandler = require("../middleware/asyncHandler");
+const { activePlayers } = require("../utils/ws");
 
 exports.getAllRooms = asyncHandler(async (req, res) => {
   const rooms = await Room.find();
-  res.json(rooms);
+
+  const roomsWithCounts = rooms.map((room) => {
+    // Filter active players by room ID
+    const playersInRoom = Array.from(activePlayers.values()).filter(
+      (p) => p.room === room._id.toString()
+    );
+
+    return {
+      ...room.toObject(),
+      activePlayers: playersInRoom,
+    };
+  });
+
+  res.json(roomsWithCounts);
 });
 
 exports.createRoom = asyncHandler(async (req, res) => {
