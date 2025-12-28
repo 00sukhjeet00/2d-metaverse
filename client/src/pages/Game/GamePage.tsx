@@ -32,10 +32,13 @@ const GamePage = () => {
 
     // Connect to the real server
     console.log("Connecting to socket server...");
-    const socket = io("http://localhost:3000", {
-      reconnectionAttempts: 5,
-      timeout: 10000,
-    });
+    const socket = io(
+      import.meta.env.VITE_SOCKET_URL || "http://localhost:3000",
+      {
+        reconnectionAttempts: 5,
+        timeout: 10000,
+      }
+    );
     socketRef.current = socket;
 
     socket.on("connect", () => {
