@@ -1,5 +1,5 @@
 import React from "react";
-import { Users, Edit2, Trash2 } from "lucide-react";
+import { Users, Edit2, Trash2, Lock } from "lucide-react";
 import Avatar from "../atoms/Avatar";
 
 interface Player {
@@ -13,6 +13,7 @@ interface RoomCardProps {
   maxPlayers: number;
   players: Player[];
   isCreator: boolean;
+  isPrivate?: boolean;
   onJoin: () => void;
   onEdit: (e: React.MouseEvent) => void;
   onDelete: (e: React.MouseEvent) => void;
@@ -24,6 +25,7 @@ const RoomCard = ({
   maxPlayers,
   players,
   isCreator,
+  isPrivate = false,
   onJoin,
   onEdit,
   onDelete,
@@ -34,9 +36,16 @@ const RoomCard = ({
       className="bg-gray-800 rounded-xl p-6 cursor-pointer hover:ring-2 hover:ring-purple-500 transition border border-gray-700 hover:border-transparent group relative flex flex-col"
     >
       <div className="flex justify-between items-start mb-4">
-        <h3 className="text-xl font-bold text-white group-hover:text-purple-400 transition pr-16 line-clamp-1">
-          {name}
-        </h3>
+        <div className="flex items-center gap-2">
+          <h3 className="text-xl font-bold text-white group-hover:text-purple-400 transition line-clamp-1">
+            {name}
+          </h3>
+          {isPrivate && (
+            <div className="flex items-center justify-center w-6 h-6 bg-purple-500/20 rounded-lg">
+              <Lock size={14} className="text-purple-400" />
+            </div>
+          )}
+        </div>
         <div className="flex items-center gap-2">
           {isCreator && (
             <div className="flex gap-1.5">
