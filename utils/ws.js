@@ -1,8 +1,10 @@
 const User = require("../model/user.model");
 
-exports.ws = (io) => {
-  const activePlayers = new Map();
+const activePlayers = new Map();
 
+exports.activePlayers = activePlayers;
+
+exports.ws = (io) => {
   io.on("connection", (socket) => {
     console.log("New player connected: ", socket.id);
     socket.on("join", async (data) => {
