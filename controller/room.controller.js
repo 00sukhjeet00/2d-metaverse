@@ -3,7 +3,7 @@ const asyncHandler = require("../middleware/asyncHandler");
 const { activePlayers } = require("../utils/ws");
 
 exports.getAllRooms = asyncHandler(async (req, res) => {
-  const rooms = await Room.find();
+  const rooms = await Room.find().select("-passcode");
 
   const roomsWithCounts = rooms.map((room) => {
     // Filter active players by room ID
@@ -42,9 +42,17 @@ exports.createRoom = asyncHandler(async (req, res) => {
     throw new Error("You have reached the maximum limit of 5 rooms.");
   }
 
+  const { isPrivate, passcode } = req.body;
+  if (isPrivate && !passcode) {
+    res.status(400);
+    throw new Error("Passcode is required for private rooms");
+  }
+
   const room = new Room({ ...req.body, createdBy: req.user.userId });
   await room.save();
-  res.json(room);
+  const roomObj = room.toObject();
+  delete roomObj.passcode;
+  res.json(roomObj);
 });
 
 exports.updateRoom = asyncHandler(async (req, res) => {

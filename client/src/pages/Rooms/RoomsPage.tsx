@@ -20,6 +20,7 @@ interface Room {
   maxPlayers: number;
   currentPlayers: number;
   createdBy: string;
+  isPrivate: boolean;
   players: { username: string; avatar: string }[];
 }
 
@@ -34,12 +35,18 @@ const RoomsPage = () => {
   const [maxPlayers, setMaxPlayers] = useState(DEFAULT_MAX_PLAYERS);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [isPrivate, setIsPrivate] = useState(false);
+  const [passcode, setPasscode] = useState("");
+  const [joiningRoom, setJoiningRoom] = useState<Room | null>(null);
+  const [inputPasscode, setInputPasscode] = useState("");
+  const [showPasscodeModal, setShowPasscodeModal] = useState(false);
 
   const transformRoom = (serverRoom: any): Room => ({
     id: serverRoom._id,
     name: serverRoom.name,
     maxPlayers: serverRoom.maxPlayers,
     createdBy: serverRoom.createdBy,
+    isPrivate: serverRoom.isPrivate || false,
     players: serverRoom.activePlayers
       ? serverRoom.activePlayers.map((p: any) => ({
           username: p.username,
@@ -69,11 +76,30 @@ const RoomsPage = () => {
   }, []);
 
   const handleJoinRoom = (room: Room) => {
+    if (room.isPrivate && room.createdBy !== user?.id) {
+      setJoiningRoom(room);
+      setShowPasscodeModal(true);
+      return;
+    }
     navigate(APP_ROUTES.GAME_PATH(room.id));
+  };
+
+  const submitPasscode = () => {
+    if (!joiningRoom || !inputPasscode.trim()) return;
+    navigate(APP_ROUTES.GAME_PATH(joiningRoom.id), {
+      state: { passcode: inputPasscode },
+    });
+    setShowPasscodeModal(false);
+    setJoiningRoom(null);
+    setInputPasscode("");
   };
 
   const handleCreateRoom = async () => {
     if (!newRoomName.trim()) return;
+    if (isPrivate && !passcode.trim()) {
+      setError("Passcode is required for private rooms");
+      return;
+    }
 
     setLoading(true);
     setError("");
@@ -82,6 +108,8 @@ const RoomsPage = () => {
       const response = await api.post(API_ENDPOINTS.ROOMS, {
         name: newRoomName,
         maxPlayers: maxPlayers,
+        isPrivate: isPrivate,
+        passcode: passcode,
       });
 
       const newRoom = transformRoom(response.data);
@@ -90,6 +118,34 @@ const RoomsPage = () => {
     } catch (err: any) {
       console.error("Failed to create room", err);
       setError(err.response?.data?.error || "Failed to create room");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleUpdateRoom = async () => {
+    if (!editingRoom || !newRoomName.trim()) return;
+
+    setLoading(true);
+    setError("");
+
+    try {
+      const response = await api.put(
+        `${API_ENDPOINTS.ROOMS}/${editingRoom.id}`,
+        {
+          name: newRoomName,
+          maxPlayers: maxPlayers,
+          isPrivate: isPrivate,
+          passcode: passcode,
+        }
+      );
+
+      const updatedRoom = transformRoom(response.data);
+      setRooms(rooms.map((r) => (r.id === editingRoom.id ? updatedRoom : r)));
+      closeModal();
+    } catch (err: any) {
+      console.error("Failed to update room", err);
+      setError(err.response?.data?.error || "Failed to update room");
     } finally {
       setLoading(false);
     }
@@ -113,33 +169,9 @@ const RoomsPage = () => {
     setEditingRoom(room);
     setNewRoomName(room.name);
     setMaxPlayers(room.maxPlayers);
+    setIsPrivate(room.isPrivate);
+    setPasscode(""); // Don't show old passcode for security, user can set new one
     setShowModal(true);
-  };
-
-  const handleUpdateRoom = async () => {
-    if (!editingRoom || !newRoomName.trim()) return;
-
-    setLoading(true);
-    setError("");
-
-    try {
-      const response = await api.put(
-        `${API_ENDPOINTS.ROOMS}/${editingRoom.id}`,
-        {
-          name: newRoomName,
-          maxPlayers: maxPlayers,
-        }
-      );
-
-      const updatedRoom = transformRoom(response.data);
-      setRooms(rooms.map((r) => (r.id === editingRoom.id ? updatedRoom : r)));
-      closeModal();
-    } catch (err: any) {
-      console.error("Failed to update room", err);
-      setError(err.response?.data?.error || "Failed to update room");
-    } finally {
-      setLoading(false);
-    }
   };
 
   const closeModal = () => {
@@ -147,6 +179,8 @@ const RoomsPage = () => {
     setEditingRoom(null);
     setNewRoomName("");
     setMaxPlayers(DEFAULT_MAX_PLAYERS);
+    setIsPrivate(false);
+    setPasscode("");
     setError("");
   };
 
@@ -229,7 +263,6 @@ const RoomsPage = () => {
                 value={newRoomName}
                 onChange={(e) => setNewRoomName(e.target.value)}
               />
-
               <FormField
                 label="Max Population"
                 type="number"
@@ -238,6 +271,32 @@ const RoomsPage = () => {
                 value={maxPlayers}
                 onChange={(e) => setMaxPlayers(Number(e.target.value))}
               />
+
+              <div className="flex items-center gap-3 bg-gray-700/30 p-4 rounded-xl border border-gray-700">
+                <input
+                  type="checkbox"
+                  id="isPrivate"
+                  checked={isPrivate}
+                  onChange={(e) => setIsPrivate(e.target.checked)}
+                  className="w-5 h-5 rounded border-gray-600 bg-gray-800 text-purple-600 focus:ring-purple-500 focus:ring-offset-gray-800"
+                />
+                <label
+                  htmlFor="isPrivate"
+                  className="text-sm font-medium text-gray-200 cursor-pointer"
+                >
+                  Make this World Private
+                </label>
+              </div>
+
+              {isPrivate && (
+                <FormField
+                  label="Security Passcode"
+                  type="password"
+                  placeholder="Set a secret code"
+                  value={passcode}
+                  onChange={(e) => setPasscode(e.target.value)}
+                />
+              )}
 
               <div className="flex gap-4 mt-10">
                 <Button variant="ghost" onClick={closeModal} className="flex-1">
@@ -249,6 +308,58 @@ const RoomsPage = () => {
                   className="flex-1"
                 >
                   {editingRoom ? "Update World" : "Ignite World"}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Passcode Entry Modal */}
+      {showPasscodeModal && (
+        <div className="fixed inset-0 bg-gray-900/90 flex items-center justify-center p-4 z-[60] backdrop-blur-xl transition-all">
+          <div className="bg-gray-800 rounded-2xl w-full max-w-sm p-8 shadow-2xl border border-gray-700 relative animate-in fade-in zoom-in duration-200">
+            <button
+              onClick={() => {
+                setShowPasscodeModal(false);
+                setJoiningRoom(null);
+                setInputPasscode("");
+              }}
+              className="absolute top-6 right-6 text-gray-400 hover:text-white transition p-1 hover:bg-gray-700 rounded-lg"
+            >
+              <X size={20} />
+            </button>
+            <h2 className="text-2xl font-black text-white mb-2 tracking-tight">
+              Access Restricted
+            </h2>
+            <p className="text-gray-400 text-sm mb-8">
+              This world is protected. Enter the passcode to proceed.
+            </p>
+
+            <div className="space-y-6">
+              <FormField
+                label="Passcode"
+                type="password"
+                placeholder="Enter world passcode"
+                value={inputPasscode}
+                onChange={(e) => setInputPasscode(e.target.value)}
+                autoFocus
+              />
+
+              <div className="flex gap-4 mt-8">
+                <Button
+                  variant="ghost"
+                  onClick={() => {
+                    setShowPasscodeModal(false);
+                    setJoiningRoom(null);
+                    setInputPasscode("");
+                  }}
+                  className="flex-1"
+                >
+                  Back
+                </Button>
+                <Button onClick={submitPasscode} className="flex-1">
+                  Enter World
                 </Button>
               </div>
             </div>

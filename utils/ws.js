@@ -1,4 +1,5 @@
 const User = require("../model/user.model");
+const Room = require("../model/room.model");
 
 const activePlayers = new Map();
 
@@ -8,8 +9,26 @@ exports.ws = (io) => {
   io.on("connection", (socket) => {
     console.log("New player connected: ", socket.id);
     socket.on("join", async (data) => {
-      const { userId, room } = data;
+      const { userId, room, passcode } = data;
       console.log(`User ${userId} attempting to join room ${room}`);
+
+      const roomData = await Room.findById(room);
+      if (!roomData) {
+        console.log(`Room ${room} not found`);
+        socket.emit("joinError", "Room not found");
+        return;
+      }
+
+      if (roomData.isPrivate) {
+        if (
+          roomData.createdBy.toString() !== userId &&
+          roomData.passcode !== passcode
+        ) {
+          console.log(`Invalid passcode for room ${room}`);
+          socket.emit("joinError", "Invalid passcode");
+          return;
+        }
+      }
 
       const user = await User.findById(userId);
       if (!user) {

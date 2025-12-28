@@ -18,6 +18,8 @@ const roomSchema = new mongoose.Schema({
     ref: "User",
     required: true,
   },
+  isPrivate: { type: Boolean, default: false },
+  passcode: { type: String, trim: true },
 });
 
 const Room = mongoose.model("Room", roomSchema);
