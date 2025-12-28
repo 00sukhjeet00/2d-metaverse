@@ -1,6 +1,7 @@
 # 2D Metaverse 🚀
 
 Welcome to the **2D Metaverse**, a high-performance, real-time multiplayer virtual world built with a focus on seamless interaction, modern aesthetics, and robust performance.
+
 Live: https://spriteworld.netlify.app/rooms
 
 ![Hero Banner](screenshots/game.png)
