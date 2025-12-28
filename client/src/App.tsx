@@ -1,10 +1,13 @@
-import { type JSX } from "react";
+import { type JSX, lazy, Suspense } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import Auth from "./components/Auth";
-import RoomSelection from "./components/RoomSelection";
-import GamePage from "./pages/GamePage";
 import { APP_ROUTES } from "./utils/constants";
 import { AuthProvider, useAuth } from "./context/AuthContext";
+import Loading from "./components/atoms/Loading";
+
+// Lazy load page components
+const AuthPage = lazy(() => import("./pages/Auth/AuthPage"));
+const RoomsPage = lazy(() => import("./pages/Rooms/RoomsPage"));
+const GamePage = lazy(() => import("./pages/Game/GamePage"));
 
 const AppRoutes = () => {
   const { user } = useAuth();
@@ -18,32 +21,34 @@ const AppRoutes = () => {
   };
 
   return (
-    <Routes>
-      <Route
-        path={APP_ROUTES.LOGIN}
-        element={!user ? <Auth /> : <Navigate to={APP_ROUTES.ROOMS} />}
-      />
+    <Suspense fallback={<Loading />}>
+      <Routes>
+        <Route
+          path={APP_ROUTES.LOGIN}
+          element={!user ? <AuthPage /> : <Navigate to={APP_ROUTES.ROOMS} />}
+        />
 
-      <Route
-        path={APP_ROUTES.ROOMS}
-        element={
-          <ProtectedRoute>
-            <RoomSelection username={user?.username} />
-          </ProtectedRoute>
-        }
-      />
+        <Route
+          path={APP_ROUTES.ROOMS}
+          element={
+            <ProtectedRoute>
+              <RoomsPage />
+            </ProtectedRoute>
+          }
+        />
 
-      <Route
-        path={APP_ROUTES.GAME}
-        element={
-          <ProtectedRoute>
-            <GamePage user={user} />
-          </ProtectedRoute>
-        }
-      />
+        <Route
+          path={APP_ROUTES.GAME}
+          element={
+            <ProtectedRoute>
+              <GamePage />
+            </ProtectedRoute>
+          }
+        />
 
-      <Route path="*" element={<Navigate to={APP_ROUTES.LOGIN} />} />
-    </Routes>
+        <Route path="*" element={<Navigate to={APP_ROUTES.LOGIN} />} />
+      </Routes>
+    </Suspense>
   );
 };
 
@@ -51,7 +56,7 @@ const App = () => {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <div className="min-h-screen bg-gray-900 text-white">
+        <div className="min-h-screen bg-gray-900 text-white font-inter">
           <AppRoutes />
         </div>
       </AuthProvider>
