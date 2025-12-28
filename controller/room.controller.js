@@ -33,6 +33,15 @@ exports.createRoom = asyncHandler(async (req, res) => {
     throw new Error("Room with this name already exists");
   }
 
+  // Check if user has already created 5 rooms
+  const userRoomsCount = await Room.countDocuments({
+    createdBy: req.user.userId,
+  });
+  if (userRoomsCount >= 5) {
+    res.status(400);
+    throw new Error("You have reached the maximum limit of 5 rooms.");
+  }
+
   const room = new Room({ ...req.body, createdBy: req.user.userId });
   await room.save();
   res.json(room);
