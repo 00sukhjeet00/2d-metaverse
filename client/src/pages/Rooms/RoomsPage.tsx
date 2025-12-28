@@ -5,6 +5,7 @@ import {
   DEFAULT_MAX_PLAYERS,
   API_ENDPOINTS,
   APP_ROUTES,
+  SOCKET_EVENTS,
 } from "../../utils/constants";
 import { api } from "../../utils/api";
 import { useAuth } from "../../context/AuthContext";
@@ -13,6 +14,7 @@ import FormField from "../../components/molecules/FormField";
 import RoomCard from "../../components/molecules/RoomCard";
 import Header from "../../components/organisms/Header";
 import Footer from "../../components/organisms/Footer";
+import { io } from "socket.io-client";
 
 interface Room {
   id: string;
@@ -74,6 +76,28 @@ const RoomsPage = () => {
 
   useEffect(() => {
     fetchRooms();
+
+    // Connect to socket for real-time player count updates
+    const socket = io(
+      import.meta.env.VITE_SOCKET_URL || "http://localhost:3000"
+    );
+
+    // Listen for player count updates
+    socket.on(
+      SOCKET_EVENTS.PLAYER_COUNT_UPDATE,
+      (counts: Record<string, number>) => {
+        setRooms((prevRooms) =>
+          prevRooms.map((room) => ({
+            ...room,
+            currentPlayers: counts[room.id] || 0,
+          }))
+        );
+      }
+    );
+
+    return () => {
+      socket.disconnect();
+    };
   }, []);
 
   const handleJoinRoom = (room: Room) => {
