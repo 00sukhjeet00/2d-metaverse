@@ -18,13 +18,12 @@ const GameCanvas = ({ user, players, socket }: GameCanvasProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const keysPressed = useRef<{ [key: string]: boolean }>({});
   const playerPos = useRef(user.position);
-  const animationFrame = useRef<number>(null);
+  const animationFrame = useRef<any>(null);
 
   const drawPlayer = (
     ctx: CanvasRenderingContext2D,
     x: number,
     y: number,
-    avatar: string,
     username: string,
     isCurrentPlayer = false
   ) => {
@@ -92,13 +91,7 @@ const GameCanvas = ({ user, players, socket }: GameCanvasProps) => {
 
       // Draw other players
       Object.values(players).forEach((player: any) => {
-        drawPlayer(
-          ctx,
-          player.position.x,
-          player.position.y,
-          player.avatar,
-          player.username
-        );
+        drawPlayer(ctx, player.position.x, player.position.y, player.username);
       });
 
       // Draw current player
@@ -106,7 +99,6 @@ const GameCanvas = ({ user, players, socket }: GameCanvasProps) => {
         ctx,
         playerPos.current.x,
         playerPos.current.y,
-        user.avatar,
         user.username,
         true
       );
@@ -165,6 +157,12 @@ const GameCanvas = ({ user, players, socket }: GameCanvasProps) => {
   // Keyboard handlers
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      // Don't move if typing in an input field (e.g. Chat)
+      const target = e.target as HTMLElement;
+      if (target.tagName === "INPUT" || target.tagName === "TEXTAREA") {
+        return;
+      }
+
       keysPressed.current[e.key] = true;
       if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key)) {
         e.preventDefault();
@@ -172,6 +170,10 @@ const GameCanvas = ({ user, players, socket }: GameCanvasProps) => {
     };
 
     const handleKeyUp = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement;
+      if (target.tagName === "INPUT" || target.tagName === "TEXTAREA") {
+        return;
+      }
       keysPressed.current[e.key] = false;
     };
 
@@ -185,15 +187,17 @@ const GameCanvas = ({ user, players, socket }: GameCanvasProps) => {
   }, []);
 
   return (
-    <div className="flex-1 p-4">
-      <div className="bg-gray-800 rounded-lg p-4">
-        <canvas
-          ref={canvasRef}
-          width={CANVAS_WIDTH}
-          height={CANVAS_HEIGHT}
-          className="border-2 border-gray-700 rounded"
-        />
-        <div className="mt-4 text-gray-400 text-sm text-center">
+    <div className="flex-1 p-4 flex flex-col items-center justify-center overflow-hidden">
+      <div className="bg-gray-800 rounded-lg p-2 md:p-4 w-full max-w-[1240px] shadow-2xl border border-gray-700">
+        <div className="relative w-full aspect-[1200/520] bg-gray-900 rounded overflow-hidden">
+          <canvas
+            ref={canvasRef}
+            width={CANVAS_WIDTH}
+            height={CANVAS_HEIGHT}
+            className="absolute top-0 left-0 w-full h-full object-contain"
+          />
+        </div>
+        <div className="mt-2 md:mt-4 text-gray-400 text-xs md:text-sm text-center">
           Use arrow keys or WASD to move around
         </div>
       </div>

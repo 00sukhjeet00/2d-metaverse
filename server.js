@@ -12,7 +12,12 @@ const errorMiddleware = require("./middleware/error.middleware");
 
 const app = express();
 const server = http.createServer(app);
-const io = socketIo(server);
+const io = socketIo(server, {
+  cors: {
+    origin: "*", // Adjust this to your client URL for better security
+    methods: ["GET", "POST"],
+  },
+});
 
 connectDB();
 ws(io);
