@@ -1,4 +1,4 @@
-import { LogOut, Users, Layout } from "lucide-react";
+import { LogOut, Users } from "lucide-react";
 import Button from "../atoms/Button";
 
 interface HeaderProps {
