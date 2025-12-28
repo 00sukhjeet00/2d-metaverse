@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { MessageSquare } from "lucide-react";
 import Header from "../../components/organisms/Header";
 import ChatBox from "../../components/organisms/ChatBox";
@@ -13,6 +13,7 @@ import { io } from "socket.io-client";
 const GamePage = () => {
   const { id: roomId } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const socketRef = useRef<any>(null);
 
   const { user, logout } = useAuth();
@@ -22,6 +23,7 @@ const GamePage = () => {
   const [showChat, setShowChat] = useState(true);
   const [isConnected, setIsConnected] = useState(false);
   const [syncedUser, setSyncedUser] = useState<any>(null);
+  const [joinError, setJoinError] = useState<string | null>(null);
 
   // Initialize Socket.io
   useEffect(() => {
@@ -44,13 +46,27 @@ const GamePage = () => {
     socket.on("connect", () => {
       console.log("Connected to server with ID:", socket.id);
       setIsConnected(true);
-      // Join the room after connection
-      socket.emit(SOCKET_EVENTS.JOIN, { userId: user.id, room: roomId });
+      // Join the room after connection with optional passcode
+      const passcode = (location.state as any)?.passcode;
+      socket.emit(SOCKET_EVENTS.JOIN, {
+        userId: user.id,
+        room: roomId,
+        passcode,
+      });
     });
 
     socket.on(SOCKET_EVENTS.JOIN_SUCCESS, (data: any) => {
       console.log("Join success, synced position:", data.position);
       setSyncedUser(data);
+    });
+
+    socket.on(SOCKET_EVENTS.JOIN_ERROR, (errorMessage: string) => {
+      console.error("Join error:", errorMessage);
+      setJoinError(errorMessage);
+      // Navigate back to rooms after a short delay
+      setTimeout(() => {
+        navigate(APP_ROUTES.ROOMS);
+      }, 3000);
     });
 
     socket.on("connect_error", (error) => {
@@ -101,7 +117,7 @@ const GamePage = () => {
       socket.emit(SOCKET_EVENTS.LEAVE, { userId: user.id, room: roomId });
       socket.disconnect();
     };
-  }, [user, roomId, navigate]);
+  }, [user, roomId, navigate, location]);
 
   const handleSendMessage = (text: string) => {
     socketRef.current?.emit(SOCKET_EVENTS.CHAT_MESSAGE, { message: text });
@@ -112,6 +128,21 @@ const GamePage = () => {
   };
 
   if (!user) return null;
+
+  // Show error message if join failed
+  if (joinError) {
+    return (
+      <div className="h-screen bg-gray-950 flex items-center justify-center">
+        <div className="bg-red-900/20 border border-red-500/50 rounded-2xl p-8 max-w-md text-center">
+          <h2 className="text-2xl font-bold text-red-400 mb-4">
+            Access Denied
+          </h2>
+          <p className="text-gray-300 mb-2">{joinError}</p>
+          <p className="text-gray-500 text-sm">Redirecting to rooms...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="h-screen bg-gray-950 flex flex-col overflow-hidden">
