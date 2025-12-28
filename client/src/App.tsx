@@ -1,8 +1,8 @@
 import { type JSX } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import Auth from "./components/Auth";
-import RoomSelection from "./components/RoomSelection";
-import GamePage from "./pages/GamePage";
+import AuthPage from "./pages/Auth/AuthPage";
+import RoomsPage from "./pages/Rooms/RoomsPage";
+import GamePage from "./pages/Game/GamePage";
 import { APP_ROUTES } from "./utils/constants";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 
@@ -21,14 +21,14 @@ const AppRoutes = () => {
     <Routes>
       <Route
         path={APP_ROUTES.LOGIN}
-        element={!user ? <Auth /> : <Navigate to={APP_ROUTES.ROOMS} />}
+        element={!user ? <AuthPage /> : <Navigate to={APP_ROUTES.ROOMS} />}
       />
 
       <Route
         path={APP_ROUTES.ROOMS}
         element={
           <ProtectedRoute>
-            <RoomSelection username={user?.username} />
+            <RoomsPage />
           </ProtectedRoute>
         }
       />
@@ -37,7 +37,7 @@ const AppRoutes = () => {
         path={APP_ROUTES.GAME}
         element={
           <ProtectedRoute>
-            <GamePage user={user} />
+            <GamePage />
           </ProtectedRoute>
         }
       />
@@ -51,7 +51,7 @@ const App = () => {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <div className="min-h-screen bg-gray-900 text-white">
+        <div className="min-h-screen bg-gray-900 text-white font-inter">
           <AppRoutes />
         </div>
       </AuthProvider>
