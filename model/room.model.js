@@ -20,6 +20,10 @@ const roomSchema = new mongoose.Schema({
   },
   isPrivate: { type: Boolean, default: false },
   passcode: { type: String, trim: true },
+  backgroundImage: { type: String }, // URL or Base64
+  width: { type: Number, default: 40 },
+  height: { type: Number, default: 30 },
+  collisionArray: [[Number]], // 2D array representing collision map
 });
 
 const Room = mongoose.model("Room", roomSchema);

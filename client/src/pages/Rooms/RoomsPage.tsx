@@ -36,6 +36,10 @@ const RoomsPage = () => {
   const [editingRoom, setEditingRoom] = useState<Room | null>(null);
   const [newRoomName, setNewRoomName] = useState("");
   const [maxPlayers, setMaxPlayers] = useState(DEFAULT_MAX_PLAYERS);
+  const [width, setWidth] = useState(40);
+  const [height, setHeight] = useState(30);
+  const [bgFile, setBgFile] = useState<File | null>(null);
+  const [collisionData, setCollisionData] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [isPrivate, setIsPrivate] = useState(false);
@@ -130,11 +134,24 @@ const RoomsPage = () => {
     setError("");
 
     try {
-      const response = await api.post(API_ENDPOINTS.ROOMS, {
-        name: newRoomName,
-        maxPlayers: maxPlayers,
-        isPrivate: isPrivate,
-        passcode: passcode,
+      const formData = new FormData();
+      formData.append("name", newRoomName);
+      formData.append("maxPlayers", String(maxPlayers));
+      formData.append("isPrivate", String(isPrivate));
+      formData.append("passcode", passcode);
+      formData.append("width", String(width));
+      formData.append("height", String(height));
+      if (bgFile) {
+        formData.append("backgroundImage", bgFile);
+      }
+      if (collisionData.trim()) {
+        formData.append("collision", collisionData);
+      }
+
+      const response = await api.post(API_ENDPOINTS.ROOMS, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       });
 
       const newRoom = transformRoom(response.data);
@@ -155,13 +172,27 @@ const RoomsPage = () => {
     setError("");
 
     try {
+      const formData = new FormData();
+      formData.append("name", newRoomName);
+      formData.append("maxPlayers", String(maxPlayers));
+      formData.append("isPrivate", String(isPrivate));
+      formData.append("passcode", passcode);
+      formData.append("width", String(width));
+      formData.append("height", String(height));
+      if (bgFile) {
+        formData.append("backgroundImage", bgFile);
+      }
+      if (collisionData.trim()) {
+        formData.append("collision", collisionData);
+      }
+
       const response = await api.put(
         `${API_ENDPOINTS.ROOMS}/${editingRoom.id}`,
+        formData,
         {
-          name: newRoomName,
-          maxPlayers: maxPlayers,
-          isPrivate: isPrivate,
-          passcode: passcode,
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
         }
       );
 
@@ -195,7 +226,15 @@ const RoomsPage = () => {
     setNewRoomName(room.name);
     setMaxPlayers(room.maxPlayers);
     setIsPrivate(room.isPrivate);
+    // Note: room.width/height is likely not in Room interface yet locally but server has it.
+    // If we want to edit we assume defaults or need to fetch full room details.
+    // For now, let's just default to standard if not present.
+    // Ideally we should fetch full details or update Room interface locally.
+    setWidth((room as any).width || 40);
+    setHeight((room as any).height || 30);
+    setCollisionData(""); // Clear or fetch if available? Fetching requires extra call.
     setPasscode(""); // Don't show old passcode for security, user can set new one
+    setBgFile(null);
     setShowModal(true);
   };
 
@@ -207,6 +246,10 @@ const RoomsPage = () => {
     setIsPrivate(false);
     setPasscode("");
     setError("");
+    setBgFile(null);
+    setCollisionData("");
+    setWidth(40);
+    setHeight(30);
   };
 
   const totalPlayersOnline = rooms.reduce(
@@ -271,7 +314,7 @@ const RoomsPage = () => {
       {/* Room Modal (Create/Edit) */}
       {showModal && (
         <div className="fixed inset-0 bg-gray-900/80 flex items-center justify-center p-4 z-50 backdrop-blur-md transition-all">
-          <div className="bg-gray-800 rounded-2xl w-full max-w-md p-8 shadow-2xl border border-gray-700 relative animate-in fade-in zoom-in duration-200">
+          <div className="bg-gray-800 rounded-2xl h-[80vh] overflow-y-auto w-full max-w-md p-8 shadow-2xl border border-gray-700 relative animate-in fade-in zoom-in duration-200 custom-scrollbar">
             <button
               onClick={closeModal}
               className="absolute top-6 right-6 text-gray-400 hover:text-white transition p-1 hover:bg-gray-700 rounded-lg"
@@ -297,6 +340,61 @@ const RoomsPage = () => {
                 value={maxPlayers}
                 onChange={(e) => setMaxPlayers(Number(e.target.value))}
               />
+
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  label="Width"
+                  type="number"
+                  min="10"
+                  max="100"
+                  value={width}
+                  onChange={(e) => setWidth(Number(e.target.value))}
+                />
+                <FormField
+                  label="Height"
+                  type="number"
+                  min="10"
+                  max="100"
+                  value={height}
+                  onChange={(e) => setHeight(Number(e.target.value))}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-400 mb-1">
+                  Background Image
+                </label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files ? e.target.files[0] : null;
+                    if (file) setBgFile(file);
+                  }}
+                  className="block w-full text-sm text-gray-400
+                    file:mr-4 file:py-2 file:px-4
+                    file:rounded-full file:border-0
+                    file:text-sm file:font-semibold
+                    file:bg-purple-500/10 file:text-purple-400
+                    hover:file:bg-purple-500/20
+                    cursor-pointer"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-400 mb-1">
+                  Collision Data (Array)
+                </label>
+                <textarea
+                  className="w-full bg-gray-700/50 border border-gray-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all h-24 text-xs font-mono"
+                  placeholder="Paste collision array here (e.g. [0,1,0,...])"
+                  value={collisionData}
+                  onChange={(e) => setCollisionData(e.target.value)}
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Paste the 1D collision array. Valid JSON format required.
+                </p>
+              </div>
 
               <div className="flex items-center gap-3 bg-gray-700/30 p-4 rounded-xl border border-gray-700">
                 <input

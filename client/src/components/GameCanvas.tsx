@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   CANVAS_WIDTH,
   CANVAS_HEIGHT,
@@ -12,12 +12,29 @@ interface GameCanvasProps {
   user: any;
   players: any;
   socket: any;
+  room?: any; // Add room prop
 }
 
-const GameCanvas = ({ user, players, socket }: GameCanvasProps) => {
+const GameCanvas = ({ user, players, socket, room }: GameCanvasProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const keysPressed = useRef<{ [key: string]: boolean }>({});
   const playerPos = useRef(user.position || { x: 400, y: 300 });
+
+  // Background image ref
+  const bgImageRef = useRef<HTMLImageElement | null>(null);
+
+  // Load background image when room changes
+  useEffect(() => {
+    if (room?.backgroundImage) {
+      const img = new Image();
+      img.src = room.backgroundImage;
+      img.onload = () => {
+        bgImageRef.current = img;
+      };
+    } else {
+      bgImageRef.current = null;
+    }
+  }, [room?.backgroundImage]);
 
   // Sync position if user data is updated (e.g. from joinSuccess)
   useEffect(() => {
@@ -81,20 +98,44 @@ const GameCanvas = ({ user, players, socket }: GameCanvasProps) => {
       ctx.fillStyle = "#1a1a2e";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      // Draw grid
-      ctx.strokeStyle = "#16213e";
-      ctx.lineWidth = 1;
-      for (let x = 0; x < canvas.width; x += GRID_SIZE) {
-        ctx.beginPath();
-        ctx.moveTo(x, 0);
-        ctx.lineTo(x, canvas.height);
-        ctx.stroke();
+      // Draw Background Image
+      if (bgImageRef.current) {
+        ctx.drawImage(bgImageRef.current, 0, 0, canvas.width, canvas.height); // simple stretch for now, or use room dims
       }
-      for (let y = 0; y < canvas.height; y += GRID_SIZE) {
-        ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.lineTo(canvas.width, y);
-        ctx.stroke();
+
+      // Draw grid only if no background image
+      if (!room?.backgroundImage) {
+        ctx.strokeStyle = "#16213e";
+        ctx.lineWidth = 1;
+        for (let x = 0; x < canvas.width; x += GRID_SIZE) {
+          ctx.beginPath();
+          ctx.moveTo(x, 0);
+          ctx.lineTo(x, canvas.height);
+          ctx.stroke();
+        }
+        for (let y = 0; y < canvas.height; y += GRID_SIZE) {
+          ctx.beginPath();
+          ctx.moveTo(0, y);
+          ctx.lineTo(canvas.width, y);
+          ctx.stroke();
+        }
+      }
+
+      // Draw Collision Boxes
+      if (room && room.collisionArray) {
+        ctx.fillStyle = "rgba(255, 0, 0, 0.3)"; // Red semi-transparent
+        room.collisionArray.forEach((row: number[], rowIndex: number) => {
+          row.forEach((cell: number, colIndex: number) => {
+            if (cell !== 0) {
+              ctx.fillRect(
+                colIndex * GRID_SIZE,
+                rowIndex * GRID_SIZE,
+                GRID_SIZE,
+                GRID_SIZE
+              );
+            }
+          });
+        });
       }
 
       // Draw other players
@@ -121,7 +162,7 @@ const GameCanvas = ({ user, players, socket }: GameCanvasProps) => {
         cancelAnimationFrame(animationFrame.current);
       }
     };
-  }, [user, players]);
+  }, [user, players, room]);
 
   // Player movement
   useEffect(() => {
