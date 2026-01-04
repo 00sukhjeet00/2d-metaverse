@@ -1,6 +1,6 @@
 export const CANVAS_WIDTH = 1200;
 export const CANVAS_HEIGHT = 520;
-export const GRID_SIZE = 50;
+export const GRID_SIZE = 48;
 export const MOVE_SPEED = 3;
 export const ANIMATION_FRAME_RATE = 16;
 
@@ -34,6 +34,15 @@ export const STORAGE_KEYS = {
 
 export const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:3000/api";
+
+export const PLAYER_RADIUS = 20;
+
+export const CONTROLS = {
+  UP: ["ArrowUp", "w"],
+  DOWN: ["ArrowDown", "s"],
+  LEFT: ["ArrowLeft", "a"],
+  RIGHT: ["ArrowRight", "d"],
+};
 
 export const API_ENDPOINTS = {
   LOGIN: "/login",
