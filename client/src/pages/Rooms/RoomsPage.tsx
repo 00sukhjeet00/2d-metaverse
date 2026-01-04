@@ -25,6 +25,11 @@ interface Room {
   createdBy: string;
   isPrivate: boolean;
   players: { username: string; avatar: string }[];
+  width?: number;
+  height?: number;
+  passcode?: string;
+  collisionData?: string;
+  backgroundImage?: string;
 }
 
 const RoomsPage = () => {
@@ -54,6 +59,11 @@ const RoomsPage = () => {
     maxPlayers: serverRoom.maxPlayers,
     createdBy: serverRoom.createdBy,
     isPrivate: serverRoom.isPrivate || false,
+    width: serverRoom.width,
+    height: serverRoom.height,
+    passcode: serverRoom.passcode,
+    collisionData: serverRoom.collisionData,
+    backgroundImage: serverRoom.backgroundImage,
     players: serverRoom.activePlayers
       ? serverRoom.activePlayers.map((p: any) => ({
           username: p.username,
@@ -171,19 +181,40 @@ const RoomsPage = () => {
     setLoading(true);
     setError("");
 
+    // Validate collision data if provided
+    let parsedCollision = null;
+    if (collisionData.trim()) {
+      try {
+        parsedCollision = JSON.parse(collisionData);
+        if (!Array.isArray(parsedCollision)) {
+          throw new Error("Collision data must be a valid array");
+        }
+      } catch (err) {
+        setError("Invalid collision data format. Must be a valid JSON array.");
+        setLoading(false);
+        return;
+      }
+    }
+
     try {
       const formData = new FormData();
       formData.append("name", newRoomName);
       formData.append("maxPlayers", String(maxPlayers));
       formData.append("isPrivate", String(isPrivate));
-      formData.append("passcode", passcode);
       formData.append("width", String(width));
       formData.append("height", String(height));
+
+      // Only update passcode if it was changed or is a private room
+      if (isPrivate && passcode) {
+        formData.append("passcode", passcode);
+      }
+
       if (bgFile) {
         formData.append("backgroundImage", bgFile);
       }
+
       if (collisionData.trim()) {
-        formData.append("collision", collisionData);
+        formData.append("collision", JSON.stringify(parsedCollision));
       }
 
       const response = await api.put(
@@ -226,15 +257,22 @@ const RoomsPage = () => {
     setNewRoomName(room.name);
     setMaxPlayers(room.maxPlayers);
     setIsPrivate(room.isPrivate);
-    // Note: room.width/height is likely not in Room interface yet locally but server has it.
-    // If we want to edit we assume defaults or need to fetch full room details.
-    // For now, let's just default to standard if not present.
-    // Ideally we should fetch full details or update Room interface locally.
-    setWidth((room as any).width || 40);
-    setHeight((room as any).height || 30);
-    setCollisionData(""); // Clear or fetch if available? Fetching requires extra call.
-    setPasscode(""); // Don't show old passcode for security, user can set new one
+    setWidth(room.width || 40);
+    setHeight(room.height || 30);
+
+    // Handle collision data - convert array to string if needed
+    if (room.collisionData) {
+      const collisionText = Array.isArray(room.collisionData)
+        ? JSON.stringify(room.collisionData, null, 2)
+        : room.collisionData;
+      setCollisionData(collisionText);
+    } else {
+      setCollisionData("");
+    }
+
+    setPasscode(room.passcode || "");
     setBgFile(null);
+    setError("");
     setShowModal(true);
   };
 
@@ -343,7 +381,7 @@ const RoomsPage = () => {
 
               <div className="grid grid-cols-2 gap-4">
                 <FormField
-                  label="Width"
+                  label="Tiles Width"
                   type="number"
                   min="10"
                   max="100"
@@ -351,7 +389,7 @@ const RoomsPage = () => {
                   onChange={(e) => setWidth(Number(e.target.value))}
                 />
                 <FormField
-                  label="Height"
+                  label="Tiles Height"
                   type="number"
                   min="10"
                   max="100"
@@ -390,9 +428,18 @@ const RoomsPage = () => {
                   placeholder="Paste collision array here (e.g. [0,1,0,...])"
                   value={collisionData}
                   onChange={(e) => setCollisionData(e.target.value)}
+                  onBlur={(e) => {
+                    // Try to format the JSON when leaving the field
+                    try {
+                      const parsed = JSON.parse(e.target.value);
+                      setCollisionData(JSON.stringify(parsed, null, 2));
+                    } catch (err) {
+                      // If not valid JSON, leave as is (will show error on submit)
+                    }
+                  }}
                 />
                 <p className="text-xs text-gray-500 mt-1">
-                  Paste the 1D collision array. Valid JSON format required.
+                  Paste a 1D array of numbers (e.g., [0,1,0,1,1,0])
                 </p>
               </div>
 
