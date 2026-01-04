@@ -27,6 +27,8 @@ app.get("/", (req, res) => {
   res.json({ status: "active", message: "2D Metaverse API is running" });
 });
 
+const path = require("path");
+
 app.use(
   cors({
     origin: process.env.CLIENT_URL || "*",
@@ -34,6 +36,7 @@ app.use(
   })
 );
 app.use(express.json());
+app.use("/public", express.static(path.join(__dirname, "public")));
 app.use("/api", userRoutes);
 app.use("/api/rooms", roomRoutes);
 

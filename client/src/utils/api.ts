@@ -30,8 +30,10 @@ axiosInstance.interceptors.request.use(
 );
 
 export const api = {
-  get: (url: string) => axiosInstance.get(url),
-  post: (url: string, data: any) => axiosInstance.post(url, data),
-  put: (url: string, data: any) => axiosInstance.put(url, data),
-  delete: (url: string) => axiosInstance.delete(url),
+  get: (url: string, config?: any) => axiosInstance.get(url, config),
+  post: (url: string, data: any, config?: any) =>
+    axiosInstance.post(url, data, config),
+  put: (url: string, data: any, config?: any) =>
+    axiosInstance.put(url, data, config),
+  delete: (url: string, config?: any) => axiosInstance.delete(url, config),
 };

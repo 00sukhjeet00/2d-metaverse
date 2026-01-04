@@ -13,3 +13,4 @@
 .pnp.*
 .yarn.bak
 yarn.lock.bak
+node_modules

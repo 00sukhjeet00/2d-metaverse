@@ -127,6 +127,31 @@ const GamePage = () => {
     navigate(APP_ROUTES.ROOMS);
   };
 
+  // Fetch room details
+  const [room, setRoom] = useState<any>(null);
+
+  useEffect(() => {
+    const fetchRoom = async () => {
+      try {
+        const res = await fetch(
+          `${
+            import.meta.env.VITE_API_BASE_URL || "http://localhost:3000/api"
+          }/rooms/${roomId}`
+        );
+        if (!res.ok) throw new Error("Failed to load room");
+        const data = await res.json();
+        setRoom(data);
+      } catch (err) {
+        console.error(err);
+        setJoinError("Failed to load room details");
+      }
+    };
+
+    if (roomId) {
+      fetchRoom();
+    }
+  }, [roomId]);
+
   if (!user) return null;
 
   // Show error message if join failed
@@ -193,6 +218,7 @@ const GamePage = () => {
             user={syncedUser || user}
             players={players}
             socket={socketRef.current}
+            room={room}
           />
         </div>
 
