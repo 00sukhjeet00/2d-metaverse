@@ -1,6 +1,7 @@
 const Room = require("../model/room.model");
 const asyncHandler = require("../middleware/asyncHandler");
 const { activePlayers } = require("../utils/ws");
+const { getBaseUrl } = require("../utils/constant");
 
 exports.getAllRooms = asyncHandler(async (req, res) => {
   const rooms = await Room.find().select("-passcode");
@@ -14,6 +15,7 @@ exports.getAllRooms = asyncHandler(async (req, res) => {
     return {
       ...room.toObject(),
       activePlayers: playersInRoom,
+      baseUrl: getBaseUrl(req),
     };
   });
 
@@ -52,9 +54,7 @@ exports.createRoom = asyncHandler(async (req, res) => {
   let backgroundImage = req.body.backgroundImage;
   if (req.file) {
     // Construct local URL
-    backgroundImage = `${req.protocol}://${req.get("host")}/public/uploads/${
-      req.file.filename
-    }`;
+    backgroundImage = `/public/uploads/${req.file.filename}`;
   }
 
   let collisionArray = [];
@@ -98,7 +98,7 @@ exports.createRoom = asyncHandler(async (req, res) => {
   await room.save();
   const roomObj = room.toObject();
   delete roomObj.passcode;
-  res.json(roomObj);
+  res.json({ ...roomObj, baseUrl: getBaseUrl(req) });
 });
 
 exports.getRoomById = asyncHandler(async (req, res) => {
@@ -109,7 +109,7 @@ exports.getRoomById = asyncHandler(async (req, res) => {
     throw new Error("Room not found");
   }
 
-  res.json(room);
+  res.json({ ...room.toObject(), baseUrl: getBaseUrl(req) });
 });
 
 exports.updateRoom = asyncHandler(async (req, res) => {
@@ -129,9 +129,7 @@ exports.updateRoom = asyncHandler(async (req, res) => {
   let updateData = { ...req.body };
 
   if (req.file) {
-    updateData.backgroundImage = `${req.protocol}://${req.get(
-      "host"
-    )}/public/uploads/${req.file.filename}`;
+    updateData.backgroundImage = `/public/uploads/${req.file.filename}`;
   }
 
   // Handle collision string parsing (multipart)
@@ -169,7 +167,7 @@ exports.updateRoom = asyncHandler(async (req, res) => {
     new: true,
     runValidators: true,
   });
-  res.json(updatedRoom);
+  res.json({ ...updatedRoom.toObject(), baseUrl: getBaseUrl(req) });
 });
 
 exports.deleteRoom = asyncHandler(async (req, res) => {

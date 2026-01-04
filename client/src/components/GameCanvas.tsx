@@ -35,7 +35,7 @@ const GameCanvas = ({ user, players, socket, room }: GameCanvasProps) => {
     if (room?.backgroundImage) {
       backgroundRef.current = new Background({
         position: { x: 0, y: 0 },
-        imageSrc: room.backgroundImage,
+        imageSrc: `${room.baseUrl}${room.backgroundImage}`,
         onLoad: (img) => {
           // Create boundaries only after image is loaded
           console.log(img.width / 4, img.height / 4);
