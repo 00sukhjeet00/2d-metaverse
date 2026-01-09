@@ -1,13 +1,13 @@
 # 2D Metaverse 🚀
 
-Welcome to the **2D Metaverse** - where the term "metaverse" is used *very* generously! 
+Welcome to the **2D Metaverse** - where the term "metaverse" is used _very_ generously!
 
 A real-time multiplayer virtual world that currently features circles moving around and chatting. But hey, the WebSocket magic works! 🎩✨
 
 Try it!: https://spriteworld.netlify.app/
 
 ![Hero Banner](screenshots/game.png)
-*Screenshot may look better than actual product. Results may vary.*
+_Screenshot may look better than actual product. Results may vary._
 
 ## ⚠️ Current Status: "It Works On My Machine" ™
 
@@ -15,51 +15,66 @@ This is very much a **Work In Progress**. Think of it as a digital construction 
 
 ### ✅ What Actually Works
 
-- **Real-time Multiplayer**: Powered by **Socket.io** - Players can see each other move! (as circles, but still)
-- **Live Chat**: You can chat with other circles in real-time. Revolutionary stuff.
-- **User Authentication**: JWT tokens keeping those circles secure.
-- **Session Persistence**: Your circle remembers where it was. Fancy!
-- **Room Management**: Join different rooms. Same circles, different backgrounds.
+- **Real-time Multiplayer**: Powered by **Socket.io** - Players can see each other move in real-time!
+- **Live Chat**: Chat with other players in real-time. Actually works smoothly!
+- **User Authentication**: JWT tokens keeping your sessions secure.
+- **Session Persistence**: Your position is saved and restored on reload. No more starting over!
+- **Room Management**: Create, join, and manage multiple rooms with custom backgrounds and collision maps.
+- **Collision Detection**: Proper wall collision with smooth sliding mechanics. No more ghost mode! 🎯
+- **Clean Architecture**: Refactored with proper classes (Player, Boundary, Background) for maintainability.
+- **Keyboard Controls**: WASD + Arrow keys for smooth movement.
+- **Player Visuals**: Circles with eyes, shadows, and color-coded players (purple for you, green for others).
+- **Dark Theme UI**: Modern purple-themed interface that doesn't hurt your eyes.
+- **Lazy Loading**: Optimized performance with code splitting.
+- **Context API**: Centralized state management for authentication.
 
-### 🚧 What's Gloriously Missing (aka The TODO List From Hell)
+### 🚧 What's Still Missing (The Actual TODO List)
 
-- **Character Sprites**: Currently using circles because "minimalism is trendy," definitely not because I haven't added sprites yet
-- **Animations**: Static circles are a design choice. A terrible one, but a choice nonetheless.
-- **Collision Detection**: Players phase through walls like ghosts. Working as intended? 👻
-- **Physics**: Gravity is just a suggestion here
-- **Sound Effects**: Experience the beauty of silence
-- **Smooth Movement**: More like "jittery teleportation with style"
-- **Proper UI/UX**: Currently channeling 1995 GeoCities energy
-- **Sprites**: Did I mention sprites? Because we really need sprites
-- **Interactive Objects**: Walls are decorative only
-- **Particle Effects**: We have... pixels?
-- **Mobile Support**: Works on mobile if you squint and pray
-- **Literally Everything That Makes Games Look Good**: Coming Soon™
+- **Character Sprites**: Still using circles with eyes. They're cute, but not exactly AAA graphics.
+- **Walking Animations**: Players slide around like they're on ice skates.
+- **Sound Effects**: Experience the beauty of silence (for now).
+- **Particle Effects**: No sparkles, explosions, or fancy effects yet.
+- **Mobile Support**: Works on desktop. Mobile is... optimistic.
+- **Interactive Objects**: Doors, items, NPCs - all coming soon™
+- **Custom Avatars**: Everyone gets a circle. Democracy!
+- **Voice Chat**: Type or stay silent, those are your options.
+- **Mini-games**: It's a chat room with collision detection. We'll get there!
 
-## 🎮 "Features" (Generous Interpretations)
+## 🎮 Features (Actually Real This Time!)
 
 ### Real-time Multiplayer
-Translation: *Two circles can see each other awkwardly slide around*
 
-### Dynamic Room Management  
-Translation: *You can switch between empty rooms with different colored backgrounds*
+**What it is:** Multiple players can join the same room and see each other move in real-time with WebSocket synchronization. Position updates are smooth and responsive.
 
-### Premium Dark Aesthetics
-Translation: *The background is black because that's easier than designing something*
+### Dynamic Room Management
 
-### Infinite Scaling (Lazy Loading)
-Translation: *It loads slowly, but we're calling it "strategic resource management"*
+**What it is:** Create custom rooms with background images, collision maps (JSON format), and player limits. Rooms persist in MongoDB and support multiple concurrent sessions.
 
-### Atomic Design System
-Translation: *The folder structure looks professional even if the code doesn't*
+### Collision Detection System
+
+**What it is:** Grid-based collision detection with smooth wall sliding. Players can't walk through walls, and movement feels natural when sliding along obstacles.
+
+### Modern UI/UX
+
+**What it is:** Dark theme with purple accents, responsive design, lazy loading, and proper form validation. Actually looks professional!
+
+### Persistent Sessions
+
+**What it is:** Your position, room, and authentication state are saved. Reload the page and you're right back where you were.
+
+### Clean Code Architecture
+
+**What it is:** Refactored from spaghetti code to proper TypeScript classes. Player, Boundary, and Background classes with separation of concerns. Future you will thank present you!
 
 ## 🛠️ Technology Stack
 
 **What it says:**
+
 - Frontend: React, TypeScript, Vite, TailwindCSS, Framer Motion
 - Backend: Node.js, Express, Socket.io, Mongoose (MongoDB)
 
 **What it means:**
+
 - We used every trendy framework we could find
 - The bundle size is... concerning
 - But it works! (mostly)
@@ -76,6 +91,7 @@ Translation: *The folder structure looks professional even if the code doesn't*
 ### Installation
 
 1.  **Clone the repository**:
+
 ```bash
     git clone https://github.com/00sukhjeet00/2d-metaverse.git
     cd 2d-metaverse
@@ -83,6 +99,7 @@ Translation: *The folder structure looks professional even if the code doesn't*
 ```
 
 2.  **Server Setup**:
+
 ```bash
     yarn
     # Create a .env file with DATABASE_URL and JWT_SECRET
@@ -92,6 +109,7 @@ Translation: *The folder structure looks professional even if the code doesn't*
 ```
 
 3.  **Client Setup**:
+
 ```bash
     cd client
     npm install
@@ -106,49 +124,79 @@ Translation: *The folder structure looks professional even if the code doesn't*
     - Question your life choices
     - But hey, it's real-time multiplayer! 🎉
 
-## 🐛 Known Issues (aka "Features")
+## 🐛 Known Issues
 
-- Players can walk through walls (it's not a bug, they're just really determined)
-- Sometimes players teleport (quantum mechanics, probably)
-- Chat messages occasionally arrive in a different timeline
-- Graphics look like they're from the Atari era (retro is in, right?)
-- Performance drops when... well, when you run it
-- The "Infinite Scaling" is more like "Definitely Finite Scaling"
+- **No sprite animations**: Players slide around without walking animations (it's on the roadmap!)
+- **Chat UI could be better**: Messages work but the interface needs polish
+- **Mobile controls**: Touch controls aren't implemented yet
+- **Performance on large maps**: Rendering could be optimized for bigger collision grids
+- **No sound**: Complete silence. Peaceful or boring? You decide.
+- **Limited player customization**: Everyone's a circle (with eyes!)
 
-## 📋 The Actual Roadmap
+## 📋 Roadmap
 
-**Phase 1: Make It Not Look Like MS Paint** 🎨
-- [ ] Add actual character sprites
-- [ ] Implement walking animations
-- [ ] Make UI not hurt people's eyes
+**Phase 1: Core Mechanics** ✅ COMPLETED
 
-**Phase 2: Make Physics Exist** ⚛️
-- [ ] Collision detection (walls should wall)
-- [ ] Smooth movement (less jitter, more glide)
-- [ ] Proper hitboxes
+- [x] Real-time multiplayer with Socket.io
+- [x] User authentication and session management
+- [x] Room creation and management
+- [x] Collision detection system
+- [x] Refactored class architecture
+- [x] Modern UI with dark theme
 
-**Phase 3: Make It Actually Fun** 🎮
-- [ ] Interactive objects
-- [ ] Mini-games
-- [ ] Sound effects
-- [ ] Particle effects
-- [ ] Literally anything engaging
+**Phase 2: Visual Polish** 🎨 IN PROGRESS
 
-**Phase 4: The Dream** ✨
-- [ ] Custom avatars
-- [ ] Voice chat
-- [ ] Mobile support that actually works
-- [ ] NFTs? (just kidding... unless? 👀)
+- [ ] Character sprite system
+- [ ] Walking animations (4-direction movement)
+- [ ] Particle effects for movement
+- [ ] Better visual feedback for interactions
+- [ ] Mobile-responsive controls
+
+**Phase 3: Interactivity** 🎮 PLANNED
+
+- [ ] Interactive objects (doors, items, NPCs)
+- [ ] Inventory system
+- [ ] Object interaction UI
+- [ ] Sound effects and background music
+- [ ] Emotes and reactions
+
+**Phase 4: Social Features** 👥 FUTURE
+
+- [ ] Private messaging
+- [ ] Friend system
+- [ ] Custom avatars and skins
+- [ ] Voice chat integration
+- [ ] User profiles and stats
+
+**Phase 5: Game Content** ✨ DREAM
+
+- [ ] Mini-games within rooms
+- [ ] Quest system
+- [ ] Achievements
+- [ ] Custom room scripting
+- [ ] Modding support
 
 ## 🤝 Contributing
 
-Please, I'm begging you, contribute. 
+Contributions are welcome! Whether you want to:
 
-Found a bug? Congratulations, you've played the game!
+- 🎨 Add sprite artwork or animations
+- 🐛 Fix bugs or improve performance
+- ✨ Implement new features from the roadmap
+- 📝 Improve documentation
+- 🧪 Add tests
 
-Want to add features? Please do, we need all the help we can get.
+Feel free to open an issue or submit a pull request. Check out the roadmap above for ideas on what to work on next!
 
-Have sprites? PLEASE SEND SPRITES.
+### Development Setup
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Make your changes
+4. Test thoroughly
+5. Commit your changes (`git commit -m 'Add amazing feature'`)
+6. Push to the branch (`git push origin feature/amazing-feature`)
+7. Open a Pull Request
 
 ## 📝 License
 
@@ -156,57 +204,58 @@ MIT License - Feel free to use this code, improve it, and most importantly, make
 
 ## 🙏 Acknowledgments
 
-- Stack Overflow (for basically writing 60% of this)
-- Coffee (for making the other 40% possible)
-- My rubber duck (best debugging partner)
-- Future contributors (you're the real heroes)
+- The Socket.io team for excellent real-time communication tools
+- The React and TypeScript communities for great documentation
+- Everyone who tested the early versions and provided feedback
+- Coffee (still essential)
 
-## ⚡ Fun Stats
+## ⚡ Project Stats
 
-- **Lines of Code**: Too many
-- **Bugs Fixed**: Some
-- **New Bugs Created**: More
-- **Coffee Consumed**: Yes
-- **Time Spent**: Don't ask
-- **Pride Level**: Medium-Low (but growing!)
+- **Architecture**: Clean, refactored TypeScript classes
+- **Features Completed**: Core multiplayer, collision detection, room management
+- **Code Quality**: Improved from spaghetti to structured
+- **Coffee Consumed**: Still yes
+- **Pride Level**: High and growing! 🚀
 
 ## 💭 Developer's Note
 
 > "Is it perfect? No.  
-> Does it work? Mostly.  
-> Am I proud of it? Surprisingly, yes.  
-> Should you use it in production? Please don't.  
-> Is it a learning experience? Absolutely!"
+> Does it work? Actually, yes!  
+> Am I proud of it? Definitely.  
+> Should you use it in production? With proper testing, maybe!  
+> Is it a learning experience? Absolutely, and it shows!"
 
 ---
 
 ## 🎯 The Truth
 
-This is a **real working multiplayer system** with WebSocket synchronization, authentication, and persistence. The bones are solid. The skin is... well, we're working on it.
+This is a **real working multiplayer system** with WebSocket synchronization, authentication, persistence, **and collision detection**. The architecture is solid, the code is clean (thanks to refactoring!), and the features actually work.
 
-Every big project starts somewhere. This is that somewhere. A somewhere that looks like circles on a black screen, but a somewhere nonetheless!
+We've gone from "circles phasing through walls" to "circles with eyes that respect boundaries." That's progress! 🎉
 
-**Current Version**: 0.1.0-alpha-circles-edition  
-**Status**: Aggressively Work In Progress  
-**Stability**: It runs!  
-**Polish**: What's that?
+The foundation is strong. The gameplay is functional. The UI is modern. We're past the prototype phase and into actual feature development.
+
+**Current Version**: 0.2.0-beta  
+**Status**: Actively Developed  
+**Stability**: Solid core, growing features  
+**Polish**: Getting there!
 
 ---
 
-Built with ❤️, ☕, and a concerning amount of Stack Overflow tabs.
+Built with ❤️, ☕, and a solid understanding of WebSocket architecture.
 
-**Remember**: Rome wasn't built in a day, and neither is a metaverse. Especially when you're one person with circles for graphics. 🎨
+**Remember**: Rome wasn't built in a day, and neither is a metaverse. But we've got collision detection, real-time multiplayer, and circles with personality. We're getting there! 🎨
 
 ---
 
 ## 🔗 Links
 
-- **Live Demo**: [Try it here](https://spriteworld.netlify.app/) *(at your own risk)*
-- **Report Bugs**: GitHub Issues *(or just assume they exist)*
-- **Support**: Close your eyes and pray
+- **Live Demo**: [Try it here](https://spriteworld.netlify.app/)
+- **Report Bugs**: [GitHub Issues](https://github.com/00sukhjeet00/2d-metaverse/issues)
+- **Contribute**: See Contributing section above
 
 ---
 
-*"It's not a bug, it's an undocumented feature"* - Every developer ever
+_"First, make it work. Then, make it right. Then, make it fast."_ - Kent Beck
 
-*P.S. - If you're a sprite artist, please help. I'm dying here.* 💀
+_P.S. - Sprite artists welcome! Let's make these circles even better._ 🎨✨
