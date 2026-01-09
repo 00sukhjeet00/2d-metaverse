@@ -133,49 +133,6 @@ This is very much a **Work In Progress**. Think of it as a digital construction 
 - **No sound**: Complete silence. Peaceful or boring? You decide.
 - **Limited player customization**: Everyone's a circle (with eyes!)
 
-## 📋 Roadmap
-
-**Phase 1: Core Mechanics** ✅ COMPLETED
-
-- [x] Real-time multiplayer with Socket.io
-- [x] User authentication and session management
-- [x] Room creation and management
-- [x] Collision detection system
-- [x] Refactored class architecture
-- [x] Modern UI with dark theme
-
-**Phase 2: Visual Polish** 🎨 IN PROGRESS
-
-- [ ] Character sprite system
-- [ ] Walking animations (4-direction movement)
-- [ ] Particle effects for movement
-- [ ] Better visual feedback for interactions
-- [ ] Mobile-responsive controls
-
-**Phase 3: Interactivity** 🎮 PLANNED
-
-- [ ] Interactive objects (doors, items, NPCs)
-- [ ] Inventory system
-- [ ] Object interaction UI
-- [ ] Sound effects and background music
-- [ ] Emotes and reactions
-
-**Phase 4: Social Features** 👥 FUTURE
-
-- [ ] Private messaging
-- [ ] Friend system
-- [ ] Custom avatars and skins
-- [ ] Voice chat integration
-- [ ] User profiles and stats
-
-**Phase 5: Game Content** ✨ DREAM
-
-- [ ] Mini-games within rooms
-- [ ] Quest system
-- [ ] Achievements
-- [ ] Custom room scripting
-- [ ] Modding support
-
 ## 🤝 Contributing
 
 Contributions are welcome! Whether you want to:
