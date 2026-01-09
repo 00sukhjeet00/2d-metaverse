@@ -126,7 +126,7 @@ This is very much a **Work In Progress**. Think of it as a digital construction 
 
 ## 🐛 Known Issues
 
-- **No sprite animations**: Players slide around without walking animations (it's on the roadmap!)
+- **No sprite animations**: Players slide around without walking animations
 - **Chat UI could be better**: Messages work but the interface needs polish
 - **Mobile controls**: Touch controls aren't implemented yet
 - **Performance on large maps**: Rendering could be optimized for bigger collision grids
@@ -139,11 +139,11 @@ Contributions are welcome! Whether you want to:
 
 - 🎨 Add sprite artwork or animations
 - 🐛 Fix bugs or improve performance
-- ✨ Implement new features from the roadmap
+- ✨ Implement new features
 - 📝 Improve documentation
 - 🧪 Add tests
 
-Feel free to open an issue or submit a pull request. Check out the roadmap above for ideas on what to work on next!
+Feel free to open an issue or submit a pull request!
 
 ### Development Setup
 
